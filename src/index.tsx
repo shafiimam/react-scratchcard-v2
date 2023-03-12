@@ -54,6 +54,21 @@ class Scratch extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = { loaded: false, finished: false };
+    this.appURL = 'https://scratch-card-app.herokuapp.com';
+    this.scReportSent = sessionStorage.getItem('scReportSent') === 'true';
+  }
+  async sendReport() {
+    console.log('sending sc report');
+    const { scReportSent } = this;
+    if (scReportSent) return;
+    const shop = Shopify?.shop ? Shopify?.shop : window.location.hostname;
+    const sendReport = await fetch(
+      `${this.appURL}/analytics/report?shop=${shop}`
+    );
+    const response = await sendReport.json();
+    const isSuccess = response.message === 'success';
+    if (isSuccess) this.scReportSent = true;
+    console.log('report sent', response);
   }
 
   componentDidMount() {
@@ -178,6 +193,14 @@ class Scratch extends Component<Props, State> {
       this.setState({ finished: true });
       if (this.props.onComplete) {
         this.props.onComplete();
+        let reportSent = sessionStorage.getItem('scReportSent');
+        if (reportSent !== 'true') {
+          console.log('sending report');
+          sessionStorage.setItem('scReportSent', true);
+          this.sendReport();
+        } else {
+          console.log('report sent already');
+        }
       }
 
       this.isFinished = true;
