@@ -189,13 +189,41 @@ class Scratch extends Component<Props, State> {
     this.lastPoint = this.getMouse(e, this.canvas);
   }
 
+  handleTouchMove = (e: any) => {
+    const currentPoint = this.getMouse(e, this.canvas);
+    const distance = this.distanceBetween(this.lastPoint, currentPoint);
+    const angle = this.angleBetween(this.lastPoint, currentPoint);
+
+    let x, y;
+
+    for (let i = 0; i < distance; i++) {
+      x = this.lastPoint ? this.lastPoint.x + Math.sin(angle) * i : 0;
+      y = this.lastPoint ? this.lastPoint.y + Math.cos(angle) * i : 0;
+      this.ctx.globalCompositeOperation = 'destination-out';
+
+      if (this.brushImage && this.props.customBrush) {
+        this.ctx.drawImage(
+          this.brushImage,
+          x,
+          y,
+          this.props.customBrush.width,
+          this.props.customBrush.height
+        );
+      } else {
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, this.props.brushSize || 20, 0, 2 * Math.PI, false);
+        this.ctx.fill();
+      }
+    }
+
+    this.lastPoint = currentPoint;
+    this.handlePercentage(this.getFilledInPixels(32));
+  }
+
   handleMouseMove = (e: any) => {
     if (!this.isDrawing) {
       return;
     }
-
-    e.preventDefault();
-
     const currentPoint = this.getMouse(e, this.canvas);
     const distance = this.distanceBetween(this.lastPoint, currentPoint);
     const angle = this.angleBetween(this.lastPoint, currentPoint);
@@ -248,9 +276,6 @@ class Scratch extends Component<Props, State> {
     };
 
     const resultStyle = {
-      visibility: this.state.loaded
-        ? ('visible' as const)
-        : ('hidden' as const),
       width: '100%',
       height: '100%'
     };
@@ -266,9 +291,9 @@ class Scratch extends Component<Props, State> {
           width={this.props.width}
           height={this.props.height}
           onMouseDown={this.handleMouseDown}
-          onTouchStart={this.handleMouseDown}
+          onTouchStart={this.handleTouchMove}
           onMouseMove={this.handleMouseMove}
-          onTouchMove={this.handleMouseMove}
+          onTouchMove={this.handleTouchMove}
           onMouseUp={this.handleMouseUp}
           onTouchEnd={this.handleMouseUp}
         />
