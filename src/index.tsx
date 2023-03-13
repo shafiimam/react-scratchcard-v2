@@ -295,7 +295,7 @@ class Scratch extends Component<Props, State> {
           onMouseMove={this.handleMouseMove}
           onTouchMove={this.handleTouchMove}
           onMouseUp={this.handleMouseUp}
-          onTouchEnd={this.handleMouseUp}
+          onTouchEnd={this.handleTouchMove}
         />
         <div className='ScratchCard__Result' style={resultStyle}>
           {this.props.children}
