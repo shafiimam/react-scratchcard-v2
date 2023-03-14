@@ -135,7 +135,7 @@ class Scratch extends Component<Props, State> {
       x = e.pageX - left - scrollLeft;
       y = e.pageY - top - scrollTop;
     } else if (e && e.touches) {
-      console.log('touches', e.touches);
+      console.log('touches', e);
       x = e.touches[0].clientX - left - scrollLeft;
       y = e.touches[0].clientY - top - scrollTop;
     }
