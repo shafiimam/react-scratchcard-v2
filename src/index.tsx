@@ -190,14 +190,36 @@ class Scratch extends Component<Props, State> {
     this.lastPoint = this.getMouse(e, this.canvas);
   }
 
+  handleTouchStart = (e: any) => {
+    e.preventDefault();
+    const currentPoint = this.getMouse(e, this.canvas);
+    const touches = e.changedTouches;
+    const { top, left } = this.canvas.getBoundingClientRect();
+    const scrollTop =
+      window.pageYOffset || document.documentElement.scrollTop;
+    const scrollLeft =
+      window.pageXOffset || document.documentElement.scrollLeft;
+    let x = 0;
+    let y = 0;
+    x = e.changedTouches[0].clientX - left - scrollLeft;
+    y = e.changedTouches[0].clientY - top - scrollTop;
+    for (let i = 0; i < touches.length; i++) {
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, 4, 0, 2 * Math.PI, false); // a circle at the start
+      this.ctx.fill();
+    }
+
+    this.lastPoint = currentPoint;
+    this.handlePercentage(this.getFilledInPixels(32));
+  }
+
   handleTouchMove = (e: any) => {
     const currentPoint = this.getMouse(e, this.canvas);
-    const distance = this.distanceBetween(this.lastPoint, currentPoint);
     const angle = this.angleBetween(this.lastPoint, currentPoint);
 
     let x, y;
 
-    for (let i = 0; i < distance; i++) {
+    for (let i = 0; i < e.changedTouches.length; i++) {
       x = this.lastPoint ? this.lastPoint.x + Math.sin(angle) * i : 0;
       y = this.lastPoint ? this.lastPoint.y + Math.cos(angle) * i : 0;
       this.ctx.globalCompositeOperation = 'destination-out';
