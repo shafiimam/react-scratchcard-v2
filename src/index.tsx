@@ -215,15 +215,18 @@ class Scratch extends Component<Props, State> {
 
   handleTouchMove = (e: any) => {
     const currentPoint = this.getMouse(e, this.canvas);
-    const angle = this.angleBetween(this.lastPoint, currentPoint);
-
-    let x, y;
-
-    for (let i = 0; i < e.changedTouches.length; i++) {
-      x = this.lastPoint ? this.lastPoint.x + Math.sin(angle) * i : 0;
-      y = this.lastPoint ? this.lastPoint.y + Math.cos(angle) * i : 0;
+    const touches = e.changedTouches;
+    for (let i = 0; i < touches.length; i++) {
       this.ctx.globalCompositeOperation = 'destination-out';
-
+      const { top, left } = this.canvas.getBoundingClientRect();
+      const scrollTop =
+        window.pageYOffset || document.documentElement.scrollTop;
+      const scrollLeft =
+        window.pageXOffset || document.documentElement.scrollLeft;
+      let x = 0;
+      let y = 0;
+      x = e.changedTouches[0].clientX - left - scrollLeft;
+      y = e.changedTouches[0].clientY - top - scrollTop;
       if (this.brushImage && this.props.customBrush) {
         this.ctx.drawImage(
           this.brushImage,
@@ -314,7 +317,7 @@ class Scratch extends Component<Props, State> {
           width={this.props.width}
           height={this.props.height}
           onMouseDown={this.handleMouseDown}
-          onTouchStart={this.handleTouchMove}
+          onTouchStart={this.handleTouchStart}
           onMouseMove={this.handleMouseMove}
           onTouchMove={this.handleTouchMove}
           onMouseUp={this.handleMouseUp}
