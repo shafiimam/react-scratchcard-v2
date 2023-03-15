@@ -191,8 +191,6 @@ class Scratch extends Component<Props, State> {
   }
 
   handleTouchStart = (e: any) => {
-    e.preventDefault();
-    const currentPoint = this.getMouse(e, this.canvas);
     const touches = e.changedTouches;
     const { top, left } = this.canvas.getBoundingClientRect();
     const scrollTop =
@@ -215,18 +213,16 @@ class Scratch extends Component<Props, State> {
 
   handleTouchMove = (e: any) => {
     const currentPoint = this.getMouse(e, this.canvas);
-    const touches = e.changedTouches;
-    for (let i = 0; i < touches.length; i++) {
+    const distance = this.distanceBetween(this.lastPoint, currentPoint);
+    const angle = this.angleBetween(this.lastPoint, currentPoint);
+
+    let x, y;
+
+    for (let i = 0; i < distance; i++) {
+      x = this.lastPoint ? this.lastPoint.x + Math.sin(angle) * i : 0;
+      y = this.lastPoint ? this.lastPoint.y + Math.cos(angle) * i : 0;
       this.ctx.globalCompositeOperation = 'destination-out';
-      const { top, left } = this.canvas.getBoundingClientRect();
-      const scrollTop =
-        window.pageYOffset || document.documentElement.scrollTop;
-      const scrollLeft =
-        window.pageXOffset || document.documentElement.scrollLeft;
-      let x = 0;
-      let y = 0;
-      x = e.changedTouches[0].clientX - left - scrollLeft;
-      y = e.changedTouches[0].clientY - top - scrollTop;
+
       if (this.brushImage && this.props.customBrush) {
         this.ctx.drawImage(
           this.brushImage,
@@ -236,8 +232,9 @@ class Scratch extends Component<Props, State> {
           this.props.customBrush.height
         );
       } else {
+        console.log('drawing');
         this.ctx.beginPath();
-        this.ctx.arc(x, y, this.props.brushSize || 20, 0, 2 * Math.PI, false);
+        this.ctx.arc(x, y, 20, 0, 2 * Math.PI, false);
         this.ctx.fill();
       }
     }
@@ -317,11 +314,11 @@ class Scratch extends Component<Props, State> {
           width={this.props.width}
           height={this.props.height}
           onMouseDown={this.handleMouseDown}
-          onTouchStart={this.handleTouchStart}
+          // onTouchStart={this.handleTouchStart}
           onMouseMove={this.handleMouseMove}
-          onTouchMove={this.handleTouchMove}
+          // onTouchMove={this.handleTouchMove}
           onMouseUp={this.handleMouseUp}
-          onTouchEnd={this.handleTouchMove}
+          // onTouchEnd={this.handleTouchMove}
         />
         <div className='ScratchCard__Result' style={resultStyle}>
           {this.props.children}
