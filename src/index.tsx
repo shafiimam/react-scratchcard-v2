@@ -61,16 +61,17 @@ class Scratch extends Component<Props, State> {
     this.isDrawing = false;
     this.lastPoint = null;
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D;
-    this.canvas.width = Math.floor(this.props.width * window.devicePixelRatio);
-    this.canvas.height = Math.floor(this.props.height * window.devicePixelRatio);
-    console.log('canvas h/w current', this.canvas.height, this.canvas.width);
-    this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    this.canvas.style.width = this.props.width + 'px';
-    this.canvas.style.height = this.props.height + 'px';
-    console.log('canva h/w updated', this.canvas.style.height, this.canvas.style.width);
+    
     this.image = new Image();
     this.image.crossOrigin = 'Anonymous';
     this.image.onload = () => {
+      this.canvas.width = Math.floor(this.props.width * window.devicePixelRatio);
+      this.canvas.height = Math.floor(this.props.height * window.devicePixelRatio);
+      console.log('canvas h/w current', this.canvas.height, this.canvas.width);
+      this.ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      this.canvas.style.width = this.props.width + 'px';
+      this.canvas.style.height = this.props.height + 'px';
+      console.log('canva h/w updated', this.canvas.style.height, this.canvas.style.width);
       this.ctx.drawImage(this.image, 0, 0, this.props.width, this.props.height);
       this.setState({ loaded: true });
     };
